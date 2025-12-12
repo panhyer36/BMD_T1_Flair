@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 from src.DataLoader import create_dataloaders
-from src.Model import SimpleCNN
+from src.Model import ResNetBMD
 
 
 def train():
@@ -36,7 +36,7 @@ def train():
     )
 
     # Create model
-    model = SimpleCNN().to(device)
+    model = ResNetBMD().to(device)
     print(f"\nModel parameters: {sum(p.numel() for p in model.parameters()):,}")
 
     # Loss function and optimizer

@@ -1,4 +1,3 @@
-python train.py
 Using Apple MPS
 
 Loading data...
@@ -10,86 +9,66 @@ Val set: 24 samples
 Test set: 24 samples
 Label stats (from train): mean=0.9679, std=0.1784
 
-Model parameters: 107,969
+Model parameters: 11,247,041
 
 Start training...
 ============================================================
-Epoch [  1/50] Train Loss: 0.4325 | Val Loss: 0.5232 *
-Epoch [  2/50] Train Loss: 0.4287 | Val Loss: 0.5150 *
-Epoch [  3/50] Train Loss: 0.4060 | Val Loss: 0.5035 *
-Epoch [  4/50] Train Loss: 0.4210 | Val Loss: 0.5168
-Epoch [  5/50] Train Loss: 0.4087 | Val Loss: 0.5267
-Epoch [  6/50] Train Loss: 0.4127 | Val Loss: 0.5537
-Epoch [  7/50] Train Loss: 0.3998 | Val Loss: 0.5133
-Epoch [  8/50] Train Loss: 0.4068 | Val Loss: 0.5109
-Epoch [  9/50] Train Loss: 0.4058 | Val Loss: 0.5093
-Epoch [ 10/50] Train Loss: 0.4093 | Val Loss: 0.5202
-Epoch [ 11/50] Train Loss: 0.4103 | Val Loss: 0.5189
-Epoch [ 12/50] Train Loss: 0.4064 | Val Loss: 0.5150
-Epoch [ 13/50] Train Loss: 0.4109 | Val Loss: 0.5189
-Epoch [ 14/50] Train Loss: 0.3867 | Val Loss: 0.5110
-Epoch [ 15/50] Train Loss: 0.3902 | Val Loss: 0.4995 *
-Epoch [ 16/50] Train Loss: 0.4055 | Val Loss: 0.5083
-Epoch [ 17/50] Train Loss: 0.3912 | Val Loss: 0.4964 *
-Epoch [ 18/50] Train Loss: 0.3877 | Val Loss: 0.5001
-Epoch [ 19/50] Train Loss: 0.3794 | Val Loss: 0.5021
-Epoch [ 20/50] Train Loss: 0.3736 | Val Loss: 0.5073
-Epoch [ 21/50] Train Loss: 0.3697 | Val Loss: 0.5024
-Epoch [ 22/50] Train Loss: 0.3514 | Val Loss: 0.5208
-Epoch [ 23/50] Train Loss: 0.3702 | Val Loss: 0.5319
-Epoch [ 24/50] Train Loss: 0.3661 | Val Loss: 0.4984
-Epoch [ 25/50] Train Loss: 0.3745 | Val Loss: 0.4984
-Epoch [ 26/50] Train Loss: 0.3601 | Val Loss: 0.5028
-Epoch [ 27/50] Train Loss: 0.3602 | Val Loss: 0.5046
-Epoch [ 28/50] Train Loss: 0.3552 | Val Loss: 0.5122
-Epoch [ 29/50] Train Loss: 0.3647 | Val Loss: 0.5132
-Epoch [ 30/50] Train Loss: 0.3610 | Val Loss: 0.5106
-Epoch [ 31/50] Train Loss: 0.3584 | Val Loss: 0.5025
-Epoch [ 32/50] Train Loss: 0.3620 | Val Loss: 0.4953 *
-Epoch [ 33/50] Train Loss: 0.3544 | Val Loss: 0.4993
-Epoch [ 34/50] Train Loss: 0.3873 | Val Loss: 0.4989
-Epoch [ 35/50] Train Loss: 0.3492 | Val Loss: 0.5060
-Epoch [ 36/50] Train Loss: 0.3450 | Val Loss: 0.5074
-Epoch [ 37/50] Train Loss: 0.3527 | Val Loss: 0.5035
-Epoch [ 38/50] Train Loss: 0.3619 | Val Loss: 0.4999
-Epoch [ 39/50] Train Loss: 0.3455 | Val Loss: 0.4971
-Epoch [ 40/50] Train Loss: 0.3480 | Val Loss: 0.4995
-Epoch [ 41/50] Train Loss: 0.3566 | Val Loss: 0.5019
-Epoch [ 42/50] Train Loss: 0.3587 | Val Loss: 0.4980
-Epoch [ 43/50] Train Loss: 0.3589 | Val Loss: 0.4976
-Epoch [ 44/50] Train Loss: 0.3553 | Val Loss: 0.4950 *
-Epoch [ 45/50] Train Loss: 0.3517 | Val Loss: 0.5005
-Epoch [ 46/50] Train Loss: 0.3570 | Val Loss: 0.4971
-Epoch [ 47/50] Train Loss: 0.3480 | Val Loss: 0.4975
-Epoch [ 48/50] Train Loss: 0.3435 | Val Loss: 0.4979
-Epoch [ 49/50] Train Loss: 0.3505 | Val Loss: 0.4971
-Epoch [ 50/50] Train Loss: 0.3521 | Val Loss: 0.4998
+Epoch [  1/50] Train Loss: 0.4162 | Val Loss: 0.5219 *
+Epoch [  2/50] Train Loss: 0.3988 | Val Loss: 0.4742 *
+Epoch [  3/50] Train Loss: 0.3326 | Val Loss: 0.4742
+Epoch [  4/50] Train Loss: 0.3577 | Val Loss: 0.5889
+Epoch [  5/50] Train Loss: 0.3222 | Val Loss: 0.4654 *
+Epoch [  6/50] Train Loss: 0.2748 | Val Loss: 0.5871
+Epoch [  7/50] Train Loss: 0.2464 | Val Loss: 0.5069
+Epoch [  8/50] Train Loss: 0.2254 | Val Loss: 0.5309
+Epoch [  9/50] Train Loss: 0.2023 | Val Loss: 0.5338
+Epoch [ 10/50] Train Loss: 0.2305 | Val Loss: 0.5727
+Epoch [ 11/50] Train Loss: 0.2113 | Val Loss: 0.5023
+Epoch [ 12/50] Train Loss: 0.2016 | Val Loss: 0.5477
+Epoch [ 13/50] Train Loss: 0.2062 | Val Loss: 0.4212 *
+Epoch [ 14/50] Train Loss: 0.1960 | Val Loss: 0.4776
+Epoch [ 15/50] Train Loss: 0.1715 | Val Loss: 0.4940
+Epoch [ 16/50] Train Loss: 0.1564 | Val Loss: 0.5110
+Epoch [ 17/50] Train Loss: 0.1792 | Val Loss: 0.5368
+Epoch [ 18/50] Train Loss: 0.1251 | Val Loss: 0.4643
+Epoch [ 19/50] Train Loss: 0.1333 | Val Loss: 0.5118
+Epoch [ 20/50] Train Loss: 0.1273 | Val Loss: 0.5449
+Epoch [ 21/50] Train Loss: 0.1264 | Val Loss: 0.5309
+Epoch [ 22/50] Train Loss: 0.1268 | Val Loss: 0.5059
+Epoch [ 23/50] Train Loss: 0.1184 | Val Loss: 0.5395
+Epoch [ 24/50] Train Loss: 0.0970 | Val Loss: 0.5213
+Epoch [ 25/50] Train Loss: 0.0922 | Val Loss: 0.5059
+Epoch [ 26/50] Train Loss: 0.1249 | Val Loss: 0.5131
+Epoch [ 27/50] Train Loss: 0.1042 | Val Loss: 0.5086
+Epoch [ 28/50] Train Loss: 0.0795 | Val Loss: 0.5087
+
+Early stopping triggered after 28 epochs (no improvement for 15 epochs)
 ============================================================
-Training complete! Best val loss: 0.4950
+Training complete! Best val loss: 0.4212
 
 Loading best model for testing...
 
 ========================================
           Test Results
 ========================================
-MSE  (Mean Squared Error):      0.0266
-RMSE (Root Mean Squared Error): 0.1632
-MAE  (Mean Absolute Error):     0.1287
-R2   (Coefficient of Determination): 0.0504
+MSE  (Mean Squared Error):      0.0241
+RMSE (Root Mean Squared Error): 0.1552
+MAE  (Mean Absolute Error):     0.1277
+R2   (Coefficient of Determination): 0.1406
 ========================================
 
 Prediction examples (first 10):
 ------------------------------
    Actual    |  Predicted  
 ------------------------------
-   1.280     |    1.015    
-   1.113     |    0.982    
-   0.931     |    0.979    
-   0.847     |    0.955    
-   0.929     |    0.953    
-   0.726     |    1.001    
-   1.010     |    0.983    
-   0.681     |    0.948    
-   1.105     |    1.057    
-   1.219     |    0.999    
+   1.280     |    1.126    
+   1.113     |    0.974    
+   0.931     |    0.731    
+   0.847     |    0.770    
+   0.929     |    0.957    
+   0.726     |    0.863    
+   1.010     |    1.093    
+   0.681     |    0.791    
+   1.105     |    1.004    
+   1.219     |    1.088    
 ------------------------------

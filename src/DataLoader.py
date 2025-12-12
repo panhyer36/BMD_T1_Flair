@@ -11,7 +11,7 @@ import cv2
 class BMDDataset(Dataset):
     """BMD prediction dataset"""
 
-    def __init__(self, file_paths, labels, img_size=256, label_mean=None, label_std=None):
+    def __init__(self, file_paths, labels, img_size=256, label_mean=None, label_std=None, augment=False):
         """
         Args:
             file_paths: List of NIfTI file paths
@@ -19,12 +19,14 @@ class BMDDataset(Dataset):
             img_size: Output image size
             label_mean: Mean for label standardization
             label_std: Std for label standardization
+            augment: Whether to apply data augmentation
         """
         self.file_paths = file_paths
         self.labels = labels
         self.img_size = img_size
         self.label_mean = label_mean
         self.label_std = label_std
+        self.augment = augment
 
     def __len__(self):
         return len(self.file_paths)
@@ -57,6 +59,18 @@ class BMDDataset(Dataset):
             for i in range(num_slices):
                 slice_2d = cv2.resize(data[:, :, start_idx + i], (self.img_size, self.img_size))
                 slices[:, :, i] = slice_2d
+
+        # Data augmentation (only for training)
+        if self.augment:
+            # Random horizontal flip
+            if np.random.rand() > 0.5:
+                slices = np.flip(slices, axis=1).copy()
+            # Random vertical flip
+            if np.random.rand() > 0.5:
+                slices = np.flip(slices, axis=0).copy()
+            # Random rotation (0, 90, 180, 270 degrees)
+            k = np.random.randint(0, 4)
+            slices = np.rot90(slices, k, axes=(0, 1)).copy()
 
         # Normalize (Z-score standardization)
         mean_val = slices.mean()
@@ -169,9 +183,9 @@ def create_dataloaders(data_dir, xlsx_path, batch_size=16, img_size=256, random_
     print(f"Label stats (from train): mean={label_mean:.4f}, std={label_std:.4f}")
 
     # Create Datasets with label standardization
-    train_dataset = BMDDataset(train_files, train_labels, img_size, label_mean, label_std)
-    val_dataset = BMDDataset(val_files, val_labels, img_size, label_mean, label_std)
-    test_dataset = BMDDataset(test_files, test_labels, img_size, label_mean, label_std)
+    train_dataset = BMDDataset(train_files, train_labels, img_size, label_mean, label_std, augment=True)
+    val_dataset = BMDDataset(val_files, val_labels, img_size, label_mean, label_std, augment=False)
+    test_dataset = BMDDataset(test_files, test_labels, img_size, label_mean, label_std, augment=False)
 
     # Create DataLoaders
     train_loader = DataLoader(
