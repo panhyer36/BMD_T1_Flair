@@ -35,8 +35,13 @@ A deep learning project for predicting spine Bone Mineral Density (BMD) from MRI
 
 ## Model Architecture
 
-- **Model**: SimpleCNN
-- **Parameters**: 33,944,257
+- **Model**: SimpleCNN (Lightweight)
+- **Input**: 15 middle slices as channels [batch, 15, 256, 256]
+- **Parameters**: 107,969
+- **Features**:
+  - Reduced channel sizes (16 -> 32 -> 64 -> 128)
+  - Global Average Pooling (reduces FC layer parameters)
+  - Dropout (0.5) for regularization
 
 ## Training Configuration
 

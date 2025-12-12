@@ -11,16 +11,20 @@ import cv2
 class BMDDataset(Dataset):
     """BMD prediction dataset"""
 
-    def __init__(self, file_paths, labels, img_size=256):
+    def __init__(self, file_paths, labels, img_size=256, label_mean=None, label_std=None):
         """
         Args:
             file_paths: List of NIfTI file paths
             labels: List of BMD labels
             img_size: Output image size
+            label_mean: Mean for label standardization
+            label_std: Std for label standardization
         """
         self.file_paths = file_paths
         self.labels = labels
         self.img_size = img_size
+        self.label_mean = label_mean
+        self.label_std = label_std
 
     def __len__(self):
         return len(self.file_paths)
@@ -30,24 +34,46 @@ class BMDDataset(Dataset):
         nii_img = nib.load(self.file_paths[idx])
         data = nii_img.get_fdata()
 
-        # Get middle slice
+        # Get middle 15 slices
         depth = data.shape[2]
-        middle_slice = data[:, :, depth // 2]
+        center = depth // 2
+        num_slices = 15
+        half_slices = num_slices // 2  # 7
 
-        # Resize to target size
-        middle_slice = cv2.resize(middle_slice, (self.img_size, self.img_size))
+        start_idx = center - half_slices
+        end_idx = start_idx + num_slices
 
-        # Normalize (Min-Max scaling to [0, 1])
-        min_val = middle_slice.min()
-        max_val = middle_slice.max()
-        if max_val - min_val > 0:
-            middle_slice = (middle_slice - min_val) / (max_val - min_val)
+        # Handle edge cases (if depth < 15)
+        if depth < num_slices:
+            # Pad with zeros if not enough slices
+            slices = np.zeros((self.img_size, self.img_size, num_slices))
+            padding = (num_slices - depth) // 2
+            for i in range(depth):
+                slice_2d = cv2.resize(data[:, :, i], (self.img_size, self.img_size))
+                slices[:, :, padding + i] = slice_2d
         else:
-            middle_slice = np.zeros_like(middle_slice)
+            # Extract middle 15 slices
+            slices = np.zeros((self.img_size, self.img_size, num_slices))
+            for i in range(num_slices):
+                slice_2d = cv2.resize(data[:, :, start_idx + i], (self.img_size, self.img_size))
+                slices[:, :, i] = slice_2d
 
-        # Convert to PyTorch tensor [1, H, W]
-        image_tensor = torch.FloatTensor(middle_slice).unsqueeze(0)
-        label_tensor = torch.FloatTensor([self.labels[idx]])
+        # Normalize (Z-score standardization)
+        mean_val = slices.mean()
+        std_val = slices.std()
+        if std_val > 0:
+            slices = (slices - mean_val) / std_val
+        else:
+            slices = np.zeros_like(slices)
+
+        # Convert to PyTorch tensor [15, H, W] - 15 channels
+        image_tensor = torch.FloatTensor(slices).permute(2, 0, 1)  # [H, W, 15] -> [15, H, W]
+
+        # Standardize label if mean/std provided
+        label = self.labels[idx]
+        if self.label_mean is not None and self.label_std is not None:
+            label = (label - self.label_mean) / self.label_std
+        label_tensor = torch.FloatTensor([label])
 
         return image_tensor, label_tensor.squeeze()
 
@@ -98,7 +124,7 @@ def create_dataloaders(data_dir, xlsx_path, batch_size=16, img_size=256, random_
         random_state: Random seed
 
     Returns:
-        train_loader, val_loader, test_loader
+        train_loader, val_loader, test_loader, label_stats (dict with mean and std)
     """
     # Load metadata
     bmd_dict = load_metadata(xlsx_path)
@@ -136,10 +162,16 @@ def create_dataloaders(data_dir, xlsx_path, batch_size=16, img_size=256, random_
     print(f"Val set: {len(val_files)} samples")
     print(f"Test set: {len(test_files)} samples")
 
-    # Create Datasets
-    train_dataset = BMDDataset(train_files, train_labels, img_size)
-    val_dataset = BMDDataset(val_files, val_labels, img_size)
-    test_dataset = BMDDataset(test_files, test_labels, img_size)
+    # Calculate label statistics from training set
+    train_labels_np = np.array(train_labels)
+    label_mean = float(train_labels_np.mean())
+    label_std = float(train_labels_np.std())
+    print(f"Label stats (from train): mean={label_mean:.4f}, std={label_std:.4f}")
+
+    # Create Datasets with label standardization
+    train_dataset = BMDDataset(train_files, train_labels, img_size, label_mean, label_std)
+    val_dataset = BMDDataset(val_files, val_labels, img_size, label_mean, label_std)
+    test_dataset = BMDDataset(test_files, test_labels, img_size, label_mean, label_std)
 
     # Create DataLoaders
     train_loader = DataLoader(
@@ -152,7 +184,8 @@ def create_dataloaders(data_dir, xlsx_path, batch_size=16, img_size=256, random_
         test_dataset, batch_size=batch_size, shuffle=False, num_workers=0
     )
 
-    return train_loader, val_loader, test_loader
+    label_stats = {'mean': label_mean, 'std': label_std}
+    return train_loader, val_loader, test_loader, label_stats
 
 
 if __name__ == '__main__':
@@ -160,11 +193,14 @@ if __name__ == '__main__':
     data_dir = 'data/Sagittal_T1_FLAIR'
     xlsx_path = 'data/metadata.xlsx'
 
-    train_loader, val_loader, test_loader = create_dataloaders(data_dir, xlsx_path)
+    train_loader, val_loader, test_loader, label_stats = create_dataloaders(data_dir, xlsx_path)
 
     # Test one batch
     for images, labels in train_loader:
         print(f"Image shape: {images.shape}")
         print(f"Label shape: {labels.shape}")
-        print(f"Label range: {labels.min():.3f} - {labels.max():.3f}")
+        print(f"Standardized label range: {labels.min():.3f} - {labels.max():.3f}")
+        # Inverse transform to original scale
+        original_labels = labels * label_stats['std'] + label_stats['mean']
+        print(f"Original label range: {original_labels.min():.3f} - {original_labels.max():.3f}")
         break

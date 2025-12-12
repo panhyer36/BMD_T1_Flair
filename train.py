@@ -29,7 +29,7 @@ def train():
 
     # Create data loaders
     print("\nLoading data...")
-    train_loader, val_loader, test_loader = create_dataloaders(
+    train_loader, val_loader, test_loader, label_stats = create_dataloaders(
         data_dir=data_dir,
         xlsx_path=xlsx_path,
         batch_size=batch_size
@@ -40,7 +40,7 @@ def train():
     print(f"\nModel parameters: {sum(p.numel() for p in model.parameters()):,}")
 
     # Loss function and optimizer
-    criterion = nn.MSELoss()
+    criterion = nn.HuberLoss(delta=1.0)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # Learning rate scheduler
@@ -50,6 +50,8 @@ def train():
 
     # Training loop
     best_val_loss = float('inf')
+    early_stop_patience = 15
+    early_stop_counter = 0
     print("\nStart training...")
     print("=" * 60)
 
@@ -89,17 +91,24 @@ def train():
         # Update learning rate
         scheduler.step(avg_val_loss)
 
-        # Save best model
+        # Save best model and early stopping check
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             torch.save(model.state_dict(), 'best_model.pth')
+            early_stop_counter = 0
             save_marker = " *"
         else:
+            early_stop_counter += 1
             save_marker = ""
 
         print(f"Epoch [{epoch+1:3d}/{epochs}] "
               f"Train Loss: {avg_train_loss:.4f} | "
               f"Val Loss: {avg_val_loss:.4f}{save_marker}")
+
+        # Early stopping
+        if early_stop_counter >= early_stop_patience:
+            print(f"\nEarly stopping triggered after {epoch+1} epochs (no improvement for {early_stop_patience} epochs)")
+            break
 
     print("=" * 60)
     print(f"Training complete! Best val loss: {best_val_loss:.4f}")
@@ -107,10 +116,10 @@ def train():
     # Test phase
     print("\nLoading best model for testing...")
     model.load_state_dict(torch.load('best_model.pth', weights_only=True))
-    evaluate(model, test_loader, device)
+    evaluate(model, test_loader, device, label_stats)
 
 
-def evaluate(model, test_loader, device):
+def evaluate(model, test_loader, device, label_stats):
     """Evaluate model on test set"""
     model.eval()
     predictions = []
@@ -125,6 +134,12 @@ def evaluate(model, test_loader, device):
 
     predictions = np.array(predictions)
     actuals = np.array(actuals)
+
+    # Inverse transform to original scale
+    label_mean = label_stats['mean']
+    label_std = label_stats['std']
+    predictions = predictions * label_std + label_mean
+    actuals = actuals * label_std + label_mean
 
     # Calculate metrics
     mse = np.mean((predictions - actuals) ** 2)
